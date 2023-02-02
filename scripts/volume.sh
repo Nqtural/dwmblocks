@@ -1,8 +1,8 @@
 #!/bin/sh
 
-volume=$(awk -F"[][]" '/Left:/ { print $2 }' <(amixer sget Master) | sed 's/%//')
+volume=$(pulseaudio-ctl status | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2};?)?)?[mGK]//g" | awk '/Volume/{print $4}')
 
-if [ $(pacmd list-sinks | awk '/muted/ { print $2 }' | sed -n \$p) == "yes" ]; then
+if [ "$(pulseaudio-ctl status | sed -r "s/\x1B\[([0-9]{1,3}(;[0-9]{1,2};?)?)?[mGK]//g" | awk '/sink muted/{print $5}')" == "yes" ]; then
     echo ""
 elif [ ${volume} -eq 0 ]; then
     echo " ${volume}%"
